@@ -1,0 +1,29 @@
+# Core AI/Agent Framework
+smolagents>=0.1.0
+transformers>=4.35.0
+torch>=2.0.0
+
+# Code Generation & Analysis
+jinja2>=3.1.0
+black>=23.0.0
+autopep8>=2.0.0
+
+# File & Project Management
+python-dotenv>=1.0.0
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+# Logging
+loguru>=0.7.0
+
+# Testing
+pytest>=7.4.0
+
+# Docker SDK
+docker>=6.1.0
+
+# HTTP requests
+requests>=2.31.0
+
+# Database
+sqlalchemy>=2.0.0
