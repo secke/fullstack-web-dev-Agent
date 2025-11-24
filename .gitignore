@@ -12,7 +12,7 @@ env/
 .env
 
 # Generated outputs
-outputs/*/
+outputs/*
 
 # IDEs
 .vscode/

@@ -17,37 +17,71 @@ class DockerAgent(BaseAgent):
     def generate_docker_compose(self, project_name: str, has_database: bool = False) -> str:
         """
         Generate docker-compose.yml for the full stack.
-        
+
         Args:
             project_name: Name of the project
             has_database: Whether to include a database service
-        
+
         Returns:
             Result message
         """
         task = f"""
         Create Docker deployment configuration for {project_name}:
-        
-        STEPS:
-        1. Generate docker-compose.yml with:
-           - backend service (port 8000)
-           - frontend service (port 3000)
-           {f"- database service ({settings.DEFAULT_DB})" if has_database else ""}
-           - proper networking between services
-           - environment variables
-           - volume mounts for development
-        
-        2. Generate README.md with:
-           - Project description
-           - Quick start guide with Docker commands
-           - Manual setup instructions
-           - API documentation links
-           - Project structure
-        
-        3. Generate .gitignore with appropriate entries
-        
+
+        CRITICAL INSTRUCTIONS - Follow these steps EXACTLY:
+
+        STEP 0: PLAN THE STRUCTURE FIRST
+        Before creating ANY files, call plan_project_structure("docker") to see the correct directory structure.
+
+        STEP 1: CREATE DOCKER CONFIG FILES IN CORRECT LOCATIONS
+        You MUST use the EXACT file paths shown below:
+
+        a) docker-compose.yml - Create at ROOT level (NOT in subdirectory):
+           - version: '3.8'
+           - services:
+             * backend:
+               - build: ./backend
+               - ports: ["8000:8000"]
+               - environment: [API_HOST=0.0.0.0, API_PORT=8000]
+               - depends_on: [database] (if has_database)
+             * frontend:
+               - build: ./frontend
+               - ports: ["3000:80"]
+               - environment: [REACT_APP_API_URL=http://localhost:8000]
+               - depends_on: [backend]
+             {f"* database: (include {settings.DEFAULT_DB} service configuration)" if has_database else ""}
+           - networks: [app-network]
+
+        b) README.md - Create at ROOT level (NOT in subdirectory):
+           - Project title: {project_name}
+           - Description of the application
+           - Quick Start section with Docker commands:
+             * docker-compose up --build
+             * Access URLs (frontend, backend, API docs)
+           - Manual Setup section
+           - Project Structure section
+           - API Documentation section
+
+        c) .gitignore - Create at ROOT level:
+           - __pycache__/
+           - *.pyc
+           - .env
+           - node_modules/
+           - build/
+           - .pytest_cache/
+           - *.log
+
+        CRITICAL PATH RULES:
+        ✓ CORRECT: "docker-compose.yml" (root level)
+        ✓ CORRECT: "README.md" (root level)
+        ✓ CORRECT: ".gitignore" (root level)
+        ✗ WRONG: "backend/docker-compose.yml" (should be at root)
+        ✗ WRONG: "frontend/README.md" (should be at root)
+
+        NOTE: Dockerfiles for backend and frontend should already exist in their respective directories
+        (backend/Dockerfile and frontend/Dockerfile). Do NOT recreate them here.
+
         Use the create_file_with_content tool for each file.
-        Place all files in the project root directory.
         """
 
         log.info(f"Generating Docker configuration for {project_name}")
